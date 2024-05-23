@@ -1,0 +1,43 @@
+import {SerializedError} from '@reduxjs/toolkit';
+import {FetchBaseQueryError} from '@reduxjs/toolkit/query';
+
+import {Interview} from '../../types/models/interview';
+
+import {useFetchInterviewsQuery} from './api';
+
+interface FetchInterviewsState {
+  interviews: Interview[] | undefined;
+  loading: boolean;
+  error: FetchBaseQueryError | SerializedError | undefined;
+  retryFetchInterviews: ReturnType<typeof useFetchInterviewsQuery>['refetch'];
+}
+
+/**
+ * Hook to fetch a list of interviews data from a remote server using RTKQuery data fetching tool
+ *  which by default wraps around fetch API as the client.
+ *
+ * This hook handles the fetching of interviews data and manages the loading and error states.
+ * It also provides a retry function to re-fetch the data if needed.
+ *
+ * @returns {FetchInterviewsState} An object containing:
+ *   - interviews: Fetched interviews data. We are going to use it in mutiple places in the app
+ *     and we could send it to a global state container but we are going to pass the data
+ *     through route param and props
+ *   - loading: A boolean representing the loading state. Allows for loading state handling.
+ *   - error: Error state or undefined.
+ *   - retryFetchInterviews: A function that can be called to retry the fetch operation in case
+ *     of an error. This provides a way for the user to manually retry fetching the data if
+ *     something goes wrong.
+ */
+const useFetchInterviews = (): FetchInterviewsState => {
+  const {data, error, isLoading, refetch} = useFetchInterviewsQuery();
+
+  return {
+    interviews: data,
+    error,
+    loading: isLoading,
+    retryFetchInterviews: refetch,
+  };
+};
+
+export default useFetchInterviews;
